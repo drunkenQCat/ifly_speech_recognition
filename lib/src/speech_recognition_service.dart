@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_sound/flutter_sound.dart';
@@ -120,7 +121,7 @@ class SpeechRecognitionService {
   // ---------------- 录音 ----------------
 
   /// 开始录音
-  Future<bool> startRecord() async {
+  Future<bool> startRecord([AudioSource source = AudioSource.defaultSource]) async {
     if (!_mRecorderIsInited) {
       _resultController?.sink.addError('未初始化录音服务');
       return false;
@@ -162,6 +163,7 @@ class SpeechRecognitionService {
           codec: Codec.pcm16,
           numChannels: 1,
           sampleRate: 16000,
+          audioSource: source,
         );
       } catch (e) {
         debugPrint('开启录音出错：$e');
