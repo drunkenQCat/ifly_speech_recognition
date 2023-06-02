@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
@@ -15,6 +17,7 @@ import 'package:web_socket_channel/io.dart';
 
 class SpeechRecognitionService {
   static SpeechRecognitionService? _instance;
+
   SpeechRecognitionService._internal(
     this.appId,
     this.appKey,
@@ -45,6 +48,9 @@ class SpeechRecognitionService {
 
   /// 录音机是否初始化
   bool _mRecorderIsInited = false;
+
+  /// 网络连接失败是否保存pcm文件
+  bool saveFlag = false;
 
   StreamController<Food>? _mRecordingDataController;
 
@@ -359,9 +365,21 @@ class SpeechRecognitionService {
   }
 
   /// 连接错误
-  void _onError(err) {
+  void _onError(err) async{
     debugPrint('连接错误：$err');
+    if (saveFlag) {await _savePcm();}
     _channel?.sink.close();
+  }
+
+  Future<void> _savePcm() async {
+    var directory = await getApplicationDocumentsDirectory();
+    var format = DateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'");
+    var date = format.format(DateTime.now());
+    var pcmDir = File('${directory.path}/pcm_temp/archived_$date.pcm');
+    var pcmFile = pcmDir.openWrite();
+    _mRecordingDataController?.stream.drain().then(
+      (value) => pcmFile.write(value.data));
+    pcmFile.close();
   }
 
   /// 连接断开
@@ -374,9 +392,13 @@ class SpeechRecognitionService {
     }
   }
 
-  /// 语音识别
-  void speechRecognition() async {
-    List<int> bytes = _handleRecordStream();
+  /// 语音识别。[saveOnFailed]：识别失败是否保存音频文件。[inputFile]：输入音频文件路径
+  void speechRecognition({bool saveOnFailed = false, String inputFile = ''}) async {
+    saveFlag = saveOnFailed;
+    List<int> bytes = [];
+    (inputFile == '')
+        ? bytes = _handleRecordStream()
+        : bytes = await File(inputFile).readAsBytes();
 
     // 总共帧数
     int frameCount = bytes.length % _kFrameSize > 0
