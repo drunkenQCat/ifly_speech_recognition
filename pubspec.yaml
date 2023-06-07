@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.5
-  intl: ^0.17.0 # 日期转换
+  intl: ^0.18.0 # 日期转换
   crypto: ^3.0.2 # 加密
   web_socket_channel: ^2.2.0 # socket
   flutter_sound: ^9.2.13
