@@ -75,7 +75,7 @@ Map<String, dynamic> speechRecognitionResultDataResultToJson(SpeechRecognitionRe
 	data['rg'] = entity.range;
 	data['ls'] = entity.isLast;
 	data['sn'] = entity.serialNumber;
-	data['ws'] =  entity.ws?.map((v) => v?.toJson())?.toList();
+	data['ws'] =  entity.ws?.map((v) => v?.toJson()).toList();
 	return data;
 }
 
@@ -94,7 +94,7 @@ speechRecognitionResultDataResultWsFromJson(SpeechRecognitionResultDataResultWs 
 Map<String, dynamic> speechRecognitionResultDataResultWsToJson(SpeechRecognitionResultDataResultWs entity) {
 	final Map<String, dynamic> data = new Map<String, dynamic>();
 	data['bg'] = entity.bg;
-	data['cw'] =  entity.cw?.map((v) => v?.toJson())?.toList();
+	data['cw'] =  entity.cw?.map((v) => v?.toJson()).toList();
 	return data;
 }
 

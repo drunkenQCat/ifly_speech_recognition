@@ -52,7 +52,7 @@ class SpeechRecognitionService {
   /// 网络连接失败是否保存pcm文件
   bool saveFlag = false;
 
-  StreamController<Food>? _mRecordingDataController;
+  StreamController<Uint8List>? _mRecordingDataController;
 
   /// 录音流数据回调
   StreamSubscription? _mRecordingDataSubscription;
@@ -152,13 +152,13 @@ class SpeechRecognitionService {
 
         // 此处是为了延时监听，保证初始化完毕
         if (_mRecordingDataController == null) {
-          _mRecordingDataController = StreamController<Food>();
+          _mRecordingDataController = StreamController<Uint8List>();
         }
         if (_mRecordingDataSubscription == null) {
           _mRecordingDataSubscription =
               _mRecordingDataController!.stream.listen((buffer) {
             if (buffer is FoodData) {
-              _micChunks.add(buffer.data!);
+              _micChunks.add(buffer);
               // debugPrint('获取音频流长度：${buffer.data!.length}');
             }
           });
