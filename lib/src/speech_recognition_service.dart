@@ -127,7 +127,8 @@ class SpeechRecognitionService {
   // ---------------- 录音 ----------------
 
   /// 开始录音
-  Future<bool> startRecord([AudioSource source = AudioSource.defaultSource]) async {
+  Future<bool> startRecord(
+      [AudioSource source = AudioSource.defaultSource]) async {
     if (!_mRecorderIsInited) {
       _resultController?.sink.addError('未初始化录音服务');
       return false;
@@ -157,10 +158,7 @@ class SpeechRecognitionService {
         if (_mRecordingDataSubscription == null) {
           _mRecordingDataSubscription =
               _mRecordingDataController!.stream.listen((buffer) {
-            if (buffer is FoodData) {
-              _micChunks.add(buffer);
-              // debugPrint('获取音频流长度：${buffer.data!.length}');
-            }
+            _micChunks.add(buffer);
           });
         }
 
@@ -365,9 +363,11 @@ class SpeechRecognitionService {
   }
 
   /// 连接错误
-  void _onError(err) async{
+  void _onError(err) async {
     debugPrint('连接错误：$err');
-    if (saveFlag) {await _savePcm();}
+    if (saveFlag) {
+      await _savePcm();
+    }
     _channel?.sink.close();
   }
 
@@ -377,8 +377,9 @@ class SpeechRecognitionService {
     var date = format.format(DateTime.now());
     var pcmDir = File('${directory.path}/pcm_temp/archived_$date.pcm');
     var pcmFile = pcmDir.openWrite();
-    _mRecordingDataController?.stream.drain().then(
-      (value) => pcmFile.write(value.data));
+    _mRecordingDataController?.stream
+        .drain()
+        .then((value) => pcmFile.write(value.data));
     pcmFile.close();
   }
 
@@ -393,7 +394,8 @@ class SpeechRecognitionService {
   }
 
   /// 语音识别。[saveOnFailed]：识别失败是否保存音频文件。[inputFile]：输入音频文件路径
-  void speechRecognition({bool saveOnFailed = false, String inputFile = ''}) async {
+  void speechRecognition(
+      {bool saveOnFailed = false, String inputFile = ''}) async {
     saveFlag = saveOnFailed;
     List<int> bytes = [];
     (inputFile == '')
